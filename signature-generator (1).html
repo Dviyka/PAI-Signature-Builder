@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PAI Defence — Генератор підписів</title>
+<meta name="theme-color" content="#0f0f0f">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%230f0f0f'/%3E%3Ccircle cx='22' cy='32' r='12' fill='none' stroke='white' stroke-width='2.5'/%3E%3Ccircle cx='42' cy='32' r='12' fill='none' stroke='white' stroke-width='2.5'/%3E%3Cline x1='22' y1='20' x2='22' y2='44' stroke='white' stroke-width='2'/%3E%3Cline x1='10' y1='32' x2='34' y2='32' stroke='white' stroke-width='2'/%3E%3Cline x1='31' y1='21' x2='53' y2='43' stroke='white' stroke-width='2'/%3E%3Cline x1='31' y1='43' x2='53' y2='21' stroke='white' stroke-width='2'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#f5f4f1;--white:#fff;--ink:#0f0f0f;--border:#dddbd6;--panel:#111;--r:5px}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;display:flex;flex-direction:column}
+header{background:var(--panel);height:54px;display:flex;align-items:center;justify-content:space-between;padding:0 36px;border-bottom:1px solid #1e1e1e}
+.logo-wrap{display:flex;align-items:center;gap:12px}
+.logo-text{font-family:'Inter',sans-serif;font-weight:600;font-size:13px;color:#fff;letter-spacing:.06em;text-transform:uppercase}
+.logo-text span{color:#555;margin-left:6px;font-weight:400;font-size:11px;letter-spacing:.1em}
+.header-tag{font-size:11px;color:#444;letter-spacing:.08em;text-transform:uppercase;font-family:'Courier New',monospace}
+.app{display:grid;grid-template-columns:320px 1fr;flex:1;min-height:0}
+.sidebar{background:var(--panel);overflow-y:auto;padding:24px 22px 48px;border-right:1px solid #1e1e1e}
+.s-label{font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:#444;font-family:'Courier New',monospace;margin:22px 0 10px}
+.s-label:first-child{margin-top:0}
+.field{margin-bottom:9px}
+label{display:block;font-size:10px;color:#555;letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px}
+input[type=text],input[type=email],input[type=url],input[type=tel]{width:100%;background:#1d1d1d;border:1px solid #2a2a2a;border-radius:var(--r);padding:8px 10px;font-family:'Courier New',monospace;font-size:12px;color:#ccc;outline:none;transition:border-color .15s}
+input:focus{border-color:#555}
+input::placeholder{color:#333}
+.hint{font-size:11px;color:#3a3a3a;margin-top:4px;line-height:1.4;font-family:'Courier New',monospace}
+.variant-tabs{display:flex;gap:6px;margin-bottom:20px}
+.vtab{flex:1;padding:8px;border:1px solid #2a2a2a;border-radius:var(--r);background:transparent;color:#555;font-family:'Courier New',monospace;font-size:11px;letter-spacing:.06em;cursor:pointer;text-align:center;transition:all .15s}
+.vtab.active{background:#fff;border-color:#fff;color:#000}
+.toggle-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.toggle-lbl{font-size:12px;color:#666}
+.toggle{position:relative;width:34px;height:18px}
+.toggle input{display:none}
+.ttrack{position:absolute;inset:0;background:#2a2a2a;border-radius:20px;cursor:pointer;transition:background .2s}
+.ttrack::after{content:'';position:absolute;width:12px;height:12px;background:#444;border-radius:50%;top:3px;left:3px;transition:transform .2s,background .2s}
+.toggle input:checked+.ttrack{background:#fff}
+.toggle input:checked+.ttrack::after{transform:translateX(16px);background:#000}
+.main{display:flex;flex-direction:column;overflow:hidden}
+.tabs{display:flex;background:var(--white);border-bottom:1px solid var(--border);padding:0 32px}
+.tab{font-family:'Courier New',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;padding:15px 0;margin-right:24px;cursor:pointer;color:#aaa;border-bottom:2px solid transparent;transition:all .15s}
+.tab.active{color:#000;border-bottom-color:#000}
+.pane{display:none;flex:1;overflow:auto;flex-direction:column}
+.pane.active{display:flex}
+.preview-wrap{flex:1;padding:32px 40px;display:flex;flex-direction:column;align-items:center;gap:24px}
+.preview-label{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#aaa;font-family:'Courier New',monospace;align-self:flex-start}
+.email-mock{background:#fff;border:1px solid var(--border);border-radius:10px;width:100%;max-width:780px;overflow:hidden;box-shadow:0 2px 20px rgba(0,0,0,.06)}
+.mock-head{padding:13px 22px;border-bottom:1px solid var(--border);background:#fafaf9}
+.mock-field{font-size:12px;color:#888;margin-bottom:2px}
+.mock-field strong{color:#333;font-weight:500}
+.mock-body{padding:22px 24px}
+.mock-text{font-size:14px;color:#555;line-height:1.6;margin-bottom:20px}
+.mock-divider{border:none;border-top:1px solid var(--border);margin-bottom:20px}
+.copy-section{width:100%;max-width:780px}
+.copy-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.copy-title{font-family:'Courier New',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#aaa}
+.btn-select{display:flex;align-items:center;gap:7px;background:#0f0f0f;color:#fff;border:none;border-radius:var(--r);padding:9px 18px;font-family:'Courier New',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:opacity .15s}
+.btn-select:hover{opacity:.75}
+.btn-select.ok{background:#1a4a1a}
+.copy-zone{background:#fff;border:1.5px dashed var(--border);border-radius:8px;padding:28px;cursor:text;user-select:text;-webkit-user-select:text}
+.copy-note{font-size:11px;color:#bbb;font-family:'Courier New',monospace;margin-top:10px;text-align:center;letter-spacing:.04em}
+.inst-wrap{padding:36px 40px;max-width:620px}
+.step{display:flex;gap:18px;margin-bottom:26px}
+.step-n{font-family:'Courier New',monospace;font-size:11px;letter-spacing:.1em;color:#999;min-width:26px;padding-top:2px}
+.step-body h3{font-family:'Inter',sans-serif;font-weight:600;font-size:13px;margin-bottom:5px}
+.step-body p{font-size:13px;color:#666;line-height:1.6}
+.step-body code{background:#eeede9;padding:2px 5px;border-radius:3px;font-family:'Courier New',monospace;font-size:11px}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-wrap">
+    <svg width="52" height="26" viewBox="0 0 52 26" fill="none"><circle cx="13" cy="13" r="12" stroke="white" stroke-width="1.8"/><line x1="13" y1="1" x2="13" y2="25" stroke="white" stroke-width="1.5"/><line x1="1" y1="13" x2="25" y2="13" stroke="white" stroke-width="1.5"/><circle cx="39" cy="13" r="12" stroke="white" stroke-width="1.8"/><line x1="28" y1="2" x2="50" y2="24" stroke="white" stroke-width="1.5"/><line x1="28" y1="24" x2="50" y2="2" stroke="white" stroke-width="1.5"/></svg>
+    <div class="logo-text">PAI Defence <span>Signature Generator</span></div>
+  </div>
+  <div class="header-tag">Email Generator</div>
+</header>
+
+<div class="app">
+  <aside class="sidebar">
+    <div class="s-label">Тип підпису</div>
+    <div class="variant-tabs">
+      <div class="vtab active" onclick="setVariant('public',this)">Public</div>
+      <div class="vtab" onclick="setVariant('inner',this)">Inner</div>
+    </div>
+
+    <div id="fields-public">
+      <div class="s-label">Фото</div>
+      <div class="field">
+        <label>URL фото</label>
+        <input type="url" id="p-photo" placeholder="https://res.cloudinary.com/…" oninput="updatePreview()">
+        <p class="hint">Квадратне, мін. 180×180px. Завантажити на cloudinary.com</p>
+      </div>
+      <div class="s-label">Особисті дані</div>
+      <div class="field"><label>Імʼя та Прізвище</label><input type="text" id="p-name" placeholder="Tonia Zakorchemna" oninput="updatePreview()"></div>
+      <div class="field"><label>Посада</label><input type="text" id="p-position" placeholder="CEO &amp; Co-founder" oninput="updatePreview()"></div>
+      <div class="field"><label>Email</label><input type="email" id="p-email" placeholder="tonia@paidefence.com" oninput="updatePreview()"></div>
+      <div class="field"><label>Телефон</label><input type="tel" id="p-phone" placeholder="+38067536227" oninput="updatePreview()"></div>
+      <div class="s-label">Соцмережі</div>
+      <div class="field"><label>LinkedIn URL</label><input type="url" id="p-linkedin" placeholder="https://linkedin.com/company/…" oninput="updatePreview()"></div>
+      <div class="field"><label>Instagram URL</label><input type="url" id="p-instagram" placeholder="https://instagram.com/…" oninput="updatePreview()"></div>
+      <div class="field"><label>Facebook URL</label><input type="url" id="p-facebook" placeholder="https://facebook.com/…" oninput="updatePreview()"></div>
+      <div class="s-label">Показувати</div>
+      <div class="toggle-row"><span class="toggle-lbl">Телефон</span><label class="toggle"><input type="checkbox" id="p-show-phone" checked onchange="updatePreview()"><span class="ttrack"></span></label></div>
+      <div class="toggle-row"><span class="toggle-lbl">LinkedIn</span><label class="toggle"><input type="checkbox" id="p-show-li" checked onchange="updatePreview()"><span class="ttrack"></span></label></div>
+      <div class="toggle-row"><span class="toggle-lbl">Instagram</span><label class="toggle"><input type="checkbox" id="p-show-ig" checked onchange="updatePreview()"><span class="ttrack"></span></label></div>
+      <div class="toggle-row"><span class="toggle-lbl">Facebook</span><label class="toggle"><input type="checkbox" id="p-show-fb" checked onchange="updatePreview()"><span class="ttrack"></span></label></div>
+    </div>
+
+    <div id="fields-inner" style="display:none">
+      <div class="s-label">Дані працівника</div>
+      <div class="field"><label>Імʼя</label><input type="text" id="i-name" placeholder="Glib" oninput="updatePreview()"></div>
+      <div class="field"><label>Посада</label><input type="text" id="i-position" placeholder="Manager" oninput="updatePreview()"></div>
+      <div class="field"><label>Email</label><input type="email" id="i-email" placeholder="hello@paidefence.com" oninput="updatePreview()"></div>
+    </div>
+  </aside>
+
+  <div class="main">
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('preview',this)">Перегляд та копіювання</div>
+      <div class="tab" onclick="switchTab('instructions',this)">Інструкція</div>
+    </div>
+
+    <div class="pane active" id="pane-preview">
+      <div class="preview-wrap">
+        <div class="preview-label">Попередній перегляд</div>
+        <div class="email-mock">
+          <div class="mock-head">
+            <div class="mock-field"><strong>Від:</strong> <span id="mock-from"></span></div>
+            <div class="mock-field"><strong>Кому:</strong> Партнер</div>
+            <div class="mock-field"><strong>Тема:</strong> Співпраця</div>
+          </div>
+          <div class="mock-body">
+            <div class="mock-text">Доброго дня! Дякую за інтерес до нашої компанії. Будемо раді обговорити деталі.</div>
+            <hr class="mock-divider">
+            <div id="sig-preview"></div>
+          </div>
+        </div>
+
+        <div class="copy-section">
+          <div class="copy-header">
+            <div class="copy-title">Скопіювати підпис → вставити в Gmail</div>
+            <button class="btn-select" id="copy-btn" onclick="selectAndCopy()">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              Виділити і скопіювати
+            </button>
+          </div>
+          <div class="copy-zone" id="copy-zone"></div>
+          <div class="copy-note">Натисни кнопку → підпис виділиться → Ctrl+C → вставляй в Gmail</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pane" id="pane-instructions">
+      <div class="inst-wrap">
+        <div class="step"><div class="step-n">01</div><div class="step-body"><h3>Виберіть тип і заповніть дані</h3><p><code>Public</code> — зовнішнє листування (фото, всі контакти). <code>Inner</code> — внутрішнє (компактний з логотипом).</p></div></div>
+        <div class="step"><div class="step-n">02</div><div class="step-body"><h3>Скопіюйте підпис</h3><p>Натисніть кнопку <code>Виділити і скопіювати</code> — підпис виділиться автоматично. Потім <code>Ctrl+C</code> (або <code>Cmd+C</code> на Mac).</p></div></div>
+        <div class="step"><div class="step-n">03</div><div class="step-body"><h3>Gmail → Налаштування → Загальні</h3><p>Шестерня ⚙️ → <code>Переглянути всі налаштування</code> → вкладка <code>Загальні</code> → розділ <code>Підпис</code>.</p></div></div>
+        <div class="step"><div class="step-n">04</div><div class="step-body"><h3>Вставте підпис</h3><p>Натисніть <code>Створити новий підпис</code>, клікніть в поле редактора і вставте <code>Ctrl+V</code>. Gmail збереже форматування.</p></div></div>
+        <div class="step"><div class="step-n">05</div><div class="step-body"><h3>Збережіть зміни</h3><p>Прокрутіть сторінку донизу → <code>Зберегти зміни</code>.</p></div></div>
+        <div class="step"><div class="step-n">⚠</div><div class="step-body"><h3>Фото — тільки публічний URL</h3><p>Завантажте фото на <code>cloudinary.com</code> (безкоштовно) — отримаєте прямий URL для вставки в поле зліва.</p></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const LOGO_BIG   = 'https://res.cloudinary.com/dov46epyo/image/upload/v1771926806/PAI_Logo_Big_grzac5.png';
+const LOGO_SMALL = 'https://res.cloudinary.com/dov46epyo/image/upload/v1771926806/PAI_Logo_Big_grzac5.png';
+
+let mode = 'public';
+const v = id => document.getElementById(id);
+
+function setVariant(name, el) {
+  mode = name;
+  document.querySelectorAll('.vtab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  v('fields-public').style.display = name === 'public' ? '' : 'none';
+  v('fields-inner').style.display  = name === 'inner'  ? '' : 'none';
+  updatePreview();
+}
+
+function switchTab(name, el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.pane').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  v('pane-' + name).classList.add('active');
+}
+
+function buildPublicHTML() {
+  const name     = v('p-name').value     || 'Імʼя Прізвище';
+  const position = v('p-position').value || 'Посада';
+  const email    = v('p-email').value    || 'email@paidefence.com';
+  const phone    = v('p-phone').value;
+  const photo    = v('p-photo').value;
+  const li       = v('p-linkedin').value;
+  const ig       = v('p-instagram').value;
+  const fb       = v('p-facebook').value;
+  const showPhone = v('p-show-phone').checked;
+  const showLi    = v('p-show-li').checked;
+  const showIg    = v('p-show-ig').checked;
+  const showFb    = v('p-show-fb').checked;
+
+  const photoTd = photo
+    ? `<td style="padding-right:16px;vertical-align:top;"><img src="${photo}" width="180" height="180" style="display:block;object-fit:cover;" alt="${name}"></td>`
+    : '';
+
+  const phoneRow = (showPhone && phone)
+    ? `<tr><td style="padding-top:4px;"><a href="tel:${phone.replace(/\s/g,'')}" style="color:#000000;font-family:'Courier New',Courier,monospace;font-size:16px;text-decoration:underline;letter-spacing:-0.05em;">${phone}</a></td></tr>` : '';
+
+  const liRow = (showLi && li) ? `<tr><td style="padding-top:8px;"><a href="${li}" style="color:#000000;font-family:'Courier New',Courier,monospace;font-size:16px;text-decoration:underline;letter-spacing:-0.05em;">linkedin</a></td></tr>` : '';
+  const igRow = (showIg && ig) ? `<tr><td style="padding-top:4px;"><a href="${ig}" style="color:#000000;font-family:'Courier New',Courier,monospace;font-size:16px;text-decoration:underline;letter-spacing:-0.05em;">instagram</a></td></tr>` : '';
+  const fbRow = (showFb && fb) ? `<tr><td style="padding-top:4px;"><a href="${fb}" style="color:#000000;font-family:'Courier New',Courier,monospace;font-size:16px;text-decoration:underline;letter-spacing:-0.05em;">facebook</a></td></tr>` : '';
+
+  return `<table cellpadding="0" cellspacing="0" style="border-collapse:collapse;max-width:760px;"><tr>${photoTd}<td style="vertical-align:top;"><table cellpadding="0" cellspacing="0"><tr><td style="padding-bottom:8px;"><span style="font-family:'Inter','Arial Black',Arial,sans-serif;font-weight:700;font-size:24px;color:#000000;text-transform:uppercase;letter-spacing:-0.05em;">${name}&nbsp;|&nbsp;PAI DEFENCE</span></td></tr><tr><td style="padding-bottom:20px;"><span style="font-family:'Courier New',Courier,monospace;font-size:20px;color:#000000;letter-spacing:-0.05em;">${position}</span></td></tr><tr><td><table cellpadding="0" cellspacing="0"><tr><td style="vertical-align:top;padding-right:40px;"><table cellpadding="0" cellspacing="0"><tr><td><a href="mailto:${email}" style="color:#000000;font-family:'Courier New',Courier,monospace;font-size:16px;text-decoration:underline;letter-spacing:-0.05em;">${email}</a></td></tr>${phoneRow}<tr><td style="padding-top:20px;"><img src="${LOGO_BIG}" height="40" style="display:block;max-width:158px;" alt="PAI Defence"></td></tr></table></td><td style="vertical-align:top;"><table cellpadding="0" cellspacing="0"><tr><td><a href="https://paidefence.com" style="color:#000000;font-family:'Courier New',Courier,monospace;font-size:16px;text-decoration:underline;letter-spacing:-0.05em;">paidefence.com</a></td></tr>${liRow}${igRow}${fbRow}</table></td></tr></table></td></tr></table></td></tr></table>`;
+}
+
+function buildInnerHTML() {
+  const name     = v('i-name').value     || 'Імʼя';
+  const position = v('i-position').value || 'Посада';
+  const email    = v('i-email').value    || 'email@paidefence.com';
+
+  return `<table cellpadding="0" cellspacing="0" style="border-collapse:collapse;max-width:520px;"><tr><td style="padding-right:16px;vertical-align:middle;"><img src="${LOGO_SMALL}" height="64" style="display:block;max-width:129px;" alt="PAI Defence"></td><td style="vertical-align:middle;"><table cellpadding="0" cellspacing="0"><tr><td style="padding-bottom:12px;"><span style="font-family:'Inter','Arial Black',Arial,sans-serif;font-weight:700;font-size:24px;color:#000000;text-transform:uppercase;letter-spacing:-0.05em;">${name}&nbsp;|&nbsp;PAI DEFENCE</span></td></tr><tr><td><span style="font-family:'Courier New',Courier,monospace;font-size:16px;color:#000000;letter-spacing:-0.05em;">${position}</span><span style="font-family:'Courier New',Courier,monospace;font-size:16px;color:#000000;letter-spacing:-0.05em;">&nbsp;&nbsp;&nbsp;&nbsp;<a href="mailto:${email}" style="color:#000000;text-decoration:none;">${email}</a></span></td></tr></table></td></tr></table>`;
+}
+
+function buildHTML() {
+  return mode === 'public' ? buildPublicHTML() : buildInnerHTML();
+}
+
+function updatePreview() {
+  const html = buildHTML();
+  v('sig-preview').innerHTML = html;
+  v('copy-zone').innerHTML = html;
+  const name  = mode === 'public' ? (v('p-name').value  || 'Імʼя Прізвище') : (v('i-name').value  || 'Імʼя');
+  const email = mode === 'public' ? (v('p-email').value || 'email@paidefence.com') : (v('i-email').value || 'email@paidefence.com');
+  v('mock-from').textContent = name + ' <' + email + '>';
+}
+
+function selectAndCopy() {
+  const zone = v('copy-zone');
+  const range = document.createRange();
+  range.selectNodeContents(zone);
+  const sel = window.getSelection();
+  sel.removeAllRanges();
+  sel.addRange(range);
+  try {
+    document.execCommand('copy');
+    const btn = v('copy-btn');
+    btn.textContent = '✓ Скопійовано!';
+    btn.classList.add('ok');
+    setTimeout(() => {
+      btn.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Виділити і скопіювати';
+      btn.classList.remove('ok');
+    }, 2500);
+  } catch(e) {}
+}
+
+v('p-name').value      = 'Tonia Zakorchemna';
+v('p-position').value  = 'CEO & Co-founder';
+v('p-email').value     = 'tonia@paidefence.com';
+v('p-phone').value     = '+38067536227';
+v('p-linkedin').value  = 'https://linkedin.com/company/paidefence';
+v('p-instagram').value = 'https://instagram.com/paidefence';
+v('p-facebook').value  = 'https://facebook.com/paidefence';
+v('i-name').value      = 'Glib';
+v('i-position').value  = 'Manager';
+v('i-email').value     = 'hello@paidefence.com';
+updatePreview();
+</script>
+</body>
+</html>
