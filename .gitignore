@@ -1,0 +1,15 @@
+# macOS
+.DS_Store
+
+# Logs
+*.log
+
+# Environment overrides
+.env
+.env.*
+
+# Build / temp
+dist/
+build/
+.tmp/
+backups/
