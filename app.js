@@ -71,6 +71,23 @@ function dataUrlSizeBytes(dataUrl) {
   const base64 = String(dataUrl || '').split(',')[1] || '';
   return Math.floor((base64.length * 3) / 4);
 }
+function setPhotoUploadState(isUploaded) {
+  const title = $('pub-photo-title');
+  const subtitle = $('pub-photo-subtitle');
+  const thumb = $('pub-photo-thumb');
+  if (!title || !subtitle || !thumb) return;
+
+  if (isUploaded) {
+    title.textContent = 'Замінити фото';
+    subtitle.textContent = 'Перетягни або клікни · мін. 180×180px';
+    thumb.style.display = 'none';
+    return;
+  }
+
+  title.textContent = 'Додати фото';
+  subtitle.textContent = 'Перетягни або клікни · мін. 180×180px';
+  thumb.style.display = 'none';
+}
 function compressToJpegDataUrl(img) {
   const canvas = document.createElement('canvas');
   canvas.width = PHOTO_OUTPUT_SIZE;
@@ -95,6 +112,7 @@ function stripHtml(html) {
   tmp.innerHTML = html;
   return tmp.innerText || tmp.textContent || '';
 }
+
 async function copyHtmlToClipboard(html) {
   const plainText = stripHtml(html);
 
@@ -203,8 +221,7 @@ function handlePhotoFile(file) {
       photoDataUrl = compressToJpegDataUrl(img);
       const thumb = $('pub-photo-thumb');
       thumb.src = photoDataUrl;
-      thumb.style.display = 'block';
-      $('photo-drop').querySelector('.photo-hint').style.display = 'none';
+      setPhotoUploadState(true);
       renderPreview();
     };
     img.src = ev.target.result;
@@ -241,8 +258,9 @@ document.querySelectorAll('input').forEach(el => el.addEventListener('input', re
 $('pub-photo').addEventListener('input', () => {
   if (v('pub-photo')) {
     photoDataUrl = null;
-    $('pub-photo-thumb').style.display = 'none';
-    $('photo-drop').querySelector('.photo-hint').style.display = '';
+    setPhotoUploadState(true);
+  } else {
+    setPhotoUploadState(false);
   }
 });
 
@@ -251,9 +269,9 @@ function renderPreview() {
 }
 
 function buildPublicPreview() {
-  const name     = v('pub-name')     || 'Name';
+  const name     = v('pub-name')     || 'Імʼя';
   const company  = COMPANY_NAME;
-  const position = v('pub-position') || 'Position';
+  const position = v('pub-position') || 'Посада';
   const email    = v('pub-email')    || 'email@company.com';
   const phone    = v('pub-phone')    || '+000 000 000';
   const website  = v('pub-website')  || 'website.com';
@@ -267,7 +285,7 @@ function buildPublicPreview() {
 
   const photo = photoUrl
     ? `<img src="${esc(photoUrl)}" class="sig-photo" alt="${esc(name)}">`
-    : `<div class="sig-photo-placeholder">Photo</div>`;
+    : `<div class="sig-photo-placeholder">Фото</div>`;
 
   const socialHtml = `
     ${linkedin  ? `<a href="${esc(linkedin)}"  target="_blank" rel="noopener">linkedin</a>`  : ''}
@@ -308,9 +326,9 @@ function buildPublicPreview() {
 }
 
 function buildInnerPreview() {
-  const name     = v('inn-name')     || 'Name';
+  const name     = v('inn-name')     || 'Імʼя';
   const company  = COMPANY_NAME;
-  const position = v('inn-position') || 'Position';
+  const position = v('inn-position') || 'Посада';
   const email    = v('inn-email')    || 'email@company.com';
   const emailHref = toMailtoHref(email);
 
@@ -468,4 +486,5 @@ $('copy-btn').addEventListener('click', async () => {
    Init
 ════════════════════════════════════════════ */
 renderPreview();
+setPhotoUploadState(false);
 initAuthGate();

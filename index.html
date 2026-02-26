@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PAI Email Signature Builder</title>
+  <title>PAI Конструктор email-підпису</title>
   <link rel="icon" type="image/png" href="assets/Favicon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -13,24 +13,28 @@
 <div class="auth-overlay" id="auth-overlay">
   <form class="auth-card" id="auth-form">
     <img class="auth-logo" src="assets/PAI_Logo-Big-Black.svg" alt="PAI">
-    <input type="password" id="auth-password" placeholder="Password" autocomplete="current-password">
+    <input type="password" id="auth-password" placeholder="Пароль" autocomplete="current-password">
     <button type="submit" class="auth-btn">Увійти</button>
     <p class="auth-error" id="auth-error"></p>
   </form>
 </div>
 
-<header>
-  <div class="header-logo">
-    <img src="assets/PAI_Logo_Big-White.svg" alt="PAI">
-    <span class="header-title">Email Signature Builder</span>
-  </div>
-</header>
-
-<div class="container">
-  <div class="layout">
+<div class="layout">
+  <header>
+    <div class="header-ticks" aria-hidden="true">
+      <span class="header-tick header-tick-top-left"></span>
+      <span class="header-tick header-tick-top-right"></span>
+      <span class="header-tick header-tick-bottom-left"></span>
+      <span class="header-tick header-tick-bottom-right"></span>
+    </div>
+    <div class="header-logo">
+      <img src="assets/PAI_Logo_Big-White.svg" alt="PAI">
+      <span class="header-title">Email Signature Builder</span>
+    </div>
+  </header>
 
     <!-- FORM -->
-    <div class="form-panel">
+    <div class="form-panel corner-ticks">
       <div class="tabs">
         <button class="tab active" data-tab="public">Public</button>
         <button class="tab" data-tab="inner">Inner</button>
@@ -40,13 +44,13 @@
       <div id="form-public">
 
         <div class="form-section">
-          <div class="section-label">Photo</div>
+          <div class="section-label">Фото</div>
           <div class="photo-upload" id="photo-drop">
             <input type="file" id="pub-photo-file" accept="image/*">
             <img class="photo-thumb" id="pub-photo-thumb" alt="">
             <div class="photo-hint">
-              <strong>Додати фото</strong>
-              Перетягни або клікни · мін. 180×180px
+              <strong id="pub-photo-title">Додати фото</strong>
+              <span id="pub-photo-subtitle">Перетягни або клікни · мін. 180×180px</span>
             </div>
           </div>
           <button class="url-toggle" id="url-toggle-btn">або вставити URL</button>
@@ -58,31 +62,31 @@
         <div class="divider"></div>
 
         <div class="form-section">
-          <div class="section-label">Identity</div>
+          <div class="section-label">Особисті дані</div>
           <div class="field">
-            <label>First &amp; Last Name</label>
-            <input type="text" id="pub-name" placeholder="Full Name" value="Full Name">
+            <label>Імʼя та прізвище</label>
+            <input type="text" id="pub-name" placeholder="Повне імʼя" value="Повне імʼя">
           </div>
           <div class="field">
-            <label>Position</label>
-            <input type="text" id="pub-position" placeholder="Position" value="Position">
+            <label>Посада</label>
+            <input type="text" id="pub-position" placeholder="Посада" value="Посада">
           </div>
         </div>
 
         <div class="divider"></div>
 
         <div class="form-section">
-          <div class="section-label">Contact</div>
+          <div class="section-label">Контакти</div>
           <div class="field">
-            <label>Email</label>
+            <label>Електронна пошта</label>
             <input type="email" id="pub-email" placeholder="hello@paidefence.com" value="hello@paidefence.com">
           </div>
           <div class="field">
-            <label>Phone</label>
+            <label>Телефон</label>
             <input type="tel" id="pub-phone" placeholder="+380000000000" value="+380000000000">
           </div>
           <div class="field">
-            <label>Website</label>
+            <label>Вебсайт</label>
             <input type="text" id="pub-website" placeholder="paidefence.com" value="paidefence.com">
           </div>
         </div>
@@ -90,17 +94,17 @@
         <div class="divider"></div>
 
         <div class="form-section">
-          <div class="section-label">Social links</div>
+          <div class="section-label">Соцмережі</div>
           <div class="field">
-            <label>LinkedIn URL</label>
+            <label>Посилання LinkedIn</label>
             <input type="url" id="pub-linkedin" placeholder="https://linkedin.com/company/paidefence">
           </div>
           <div class="field">
-            <label>Instagram URL</label>
+            <label>Посилання Instagram</label>
             <input type="url" id="pub-instagram" placeholder="https://instagram.com/paidefence">
           </div>
           <div class="field">
-            <label>Facebook URL</label>
+            <label>Посилання Facebook</label>
             <input type="url" id="pub-facebook" placeholder="https://facebook.com/paidefence">
           </div>
         </div>
@@ -111,23 +115,23 @@
       <div id="form-inner" style="display:none;">
 
         <div class="form-section">
-          <div class="section-label">Identity</div>
+          <div class="section-label">Особисті дані</div>
           <div class="field">
-            <label>First &amp; Last Name</label>
-            <input type="text" id="inn-name" placeholder="Name" value="Name">
+            <label>Імʼя та прізвище</label>
+            <input type="text" id="inn-name" placeholder="Імʼя" value="Імʼя">
           </div>
           <div class="field">
-            <label>Position</label>
-            <input type="text" id="inn-position" placeholder="Manager" value="Manager">
+            <label>Посада</label>
+            <input type="text" id="inn-position" placeholder="Посада" value="Посада">
           </div>
         </div>
 
         <div class="divider"></div>
 
         <div class="form-section">
-          <div class="section-label">Contact</div>
+          <div class="section-label">Контакти</div>
           <div class="field">
-            <label>Email</label>
+            <label>Електронна пошта</label>
             <input type="email" id="inn-email" placeholder="hello@paidefence.com" value="hello@paidefence.com">
           </div>
         </div>
@@ -138,7 +142,7 @@
 
     <!-- PREVIEW -->
     <div class="preview-panel">
-      <div class="preview-box">
+      <div class="preview-box corner-ticks">
         <div class="preview-content" id="preview-box"></div>
         <button class="copy-btn" id="copy-btn">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -147,30 +151,36 @@
           Скопіювати підпис
         </button>
       </div>
-      <div class="instruction-card">
-        <p class="instruction-title">How To Use</p>
+      <div class="instruction-card corner-ticks">
+        <p class="instruction-title">Як користуватись</p>
         <ol class="instruction-list">
           <li>Оберіть тип підпису за допомогою перемикача</li>
           <li>Введіть інформацію в поля зліва</li>
           <li>Натисніть кнопку «Скопіювати підпис»</li>
         </ol>
         <div class="instruction-divider"></div>
-        <p class="instruction-title">Gmail Setup</p>
+        <p class="instruction-title">Налаштування Gmail</p>
         <ol class="instruction-list">
-          <li>Відкрийте Gmail → ⚙️ Settings → See all settings</li>
-          <li>У вкладці General знайдіть блок Signature</li>
-          <li>Натисніть Create new і вставте скопійований підпис</li>
-          <li>Оберіть підпис у Signature defaults і натисніть Save Changes</li>
+          <li>Відкрийте Gmail → ⚙️ Settings (Налаштування) → See all settings (Усі налаштування)</li>
+          <li>У вкладці General (Загальні) знайдіть блок Signature (Підпис)</li>
+          <li>Натисніть Create new (Створити новий) і вставте скопійований підпис</li>
+          <li>Оберіть підпис у Signature defaults (Підпис за замовчуванням) і натисніть Save Changes (Зберегти зміни) — кнопка в самому низу сторінки</li>
         </ol>
       </div>
     </div>
 
+</div>
+
+<div class="column-guides" aria-hidden="true">
+  <div class="column-guides-inner">
+    <div class="column-guide column-guide-settings"></div>
+    <div class="column-guide column-guide-preview"></div>
   </div>
 </div>
 
 <div class="made-by-wrap">
   <a class="made-by-link" href="https://www.2ka.studio/" target="_blank" rel="noopener">
-    <span class="made-by-text">Made By</span>
+    <span class="made-by-text">Зроблено</span>
     <img class="made-by-logo" src="assets/Dviika_Logo-Big-Black.svg" alt="Dviika">
   </a>
 </div>
