@@ -11,7 +11,8 @@
       --gray-200: #e5e5e5;
       --gray-400: #a0a0a0;
       --gray-600: #666666;
-      --green:    #3BB477;
+      --brand:    #0071BD;
+      --success:  var(--brand);
       --content-max-width: 1280px;
       --shell-gutter: 28px;
       --shell-width: min(var(--content-max-width), calc(100vw - (var(--shell-gutter) * 2)));
@@ -318,7 +319,7 @@
       transition: background 0.15s;
     }
     .copy-btn:hover { background: #222; }
-    .copy-btn.success { background: var(--green); }
+    .copy-btn.success { background: var(--success); }
     .copy-btn svg { width: 16px; height: 16px; flex-shrink: 0; }
     .instruction-card {
       margin-top: 28px;
