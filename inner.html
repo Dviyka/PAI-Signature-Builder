@@ -9,7 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
 </head>
-<body data-mode="public">
+<body data-mode="inner">
 <div class="auth-overlay" id="auth-overlay">
   <form class="auth-card" id="auth-form">
     <img class="auth-logo" src="assets/PAI_Logo-Big-Black.svg" alt="PAI">
@@ -32,40 +32,21 @@
       <span class="header-title">Email Signature Builder</span>
     </div>
     <nav class="header-nav" aria-label="Signature pages">
-      <a class="header-link active" href="./index.html">Public</a>
-      <a class="header-link" href="./inner.html">Inner</a>
+      <a class="header-link" href="./index.html">Public</a>
+      <a class="header-link active" href="./inner.html">Inner</a>
     </nav>
   </header>
 
-    <!-- FORM -->
     <div class="form-panel corner-ticks">
-        <div class="form-section">
-          <div class="section-label">Фото</div>
-          <div class="photo-upload" id="photo-drop">
-            <input type="file" id="pub-photo-file" accept="image/*">
-            <img class="photo-thumb" id="pub-photo-thumb" alt="">
-            <div class="photo-hint">
-              <strong id="pub-photo-title">Додати фото</strong>
-              <span id="pub-photo-subtitle">Перетягни або клікни · мін. 180×180px</span>
-            </div>
-          </div>
-          <button class="url-toggle" id="url-toggle-btn">або вставити URL</button>
-          <div id="url-field" style="display:none;">
-            <input type="url" id="pub-photo" placeholder="https://res.cloudinary.com/…" style="margin-top:8px;">
-          </div>
-        </div>
-
-        <div class="divider"></div>
-
         <div class="form-section">
           <div class="section-label">Особисті дані</div>
           <div class="field">
             <label>Імʼя та прізвище</label>
-            <input type="text" id="pub-name" placeholder="Повне імʼя" value="Повне імʼя">
+            <input type="text" id="inn-name" placeholder="Імʼя" value="Імʼя">
           </div>
           <div class="field">
             <label>Посада</label>
-            <input type="text" id="pub-position" placeholder="Посада" value="Посада">
+            <input type="text" id="inn-position" placeholder="Посада" value="Посада">
           </div>
         </div>
 
@@ -75,39 +56,12 @@
           <div class="section-label">Контакти</div>
           <div class="field">
             <label>Електронна пошта</label>
-            <input type="email" id="pub-email" placeholder="hello@paidefence.com" value="hello@paidefence.com">
-          </div>
-          <div class="field">
-            <label>Телефон</label>
-            <input type="tel" id="pub-phone" placeholder="+380000000000" value="+380000000000">
-          </div>
-          <div class="field">
-            <label>Вебсайт</label>
-            <input type="text" id="pub-website" placeholder="paidefence.com" value="paidefence.com">
+            <input type="email" id="inn-email" placeholder="hello@paidefence.com" value="hello@paidefence.com">
           </div>
         </div>
 
-        <div class="divider"></div>
+    </div>
 
-        <div class="form-section">
-          <div class="section-label">Соцмережі</div>
-          <div class="field">
-            <label>Посилання LinkedIn</label>
-            <input type="url" id="pub-linkedin" placeholder="https://linkedin.com/company/paidefence">
-          </div>
-          <div class="field">
-            <label>Посилання Instagram</label>
-            <input type="url" id="pub-instagram" placeholder="https://instagram.com/paidefence">
-          </div>
-          <div class="field">
-            <label>Посилання Facebook</label>
-            <input type="url" id="pub-facebook" placeholder="https://facebook.com/paidefence">
-          </div>
-        </div>
-
-    </div><!-- /form-panel -->
-
-    <!-- PREVIEW -->
     <div class="preview-panel">
       <div class="preview-box corner-ticks">
         <div class="preview-content" id="preview-box"></div>
@@ -152,7 +106,6 @@
   </a>
 </div>
 
-<!-- Hidden zone for select-and-copy -->
 <div id="copy-zone" style="position:fixed;left:-99999px;top:0;background:white;"></div>
 
 <script src="app.js" defer></script>

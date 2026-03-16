@@ -57,6 +57,27 @@
       align-items: center;
       gap: 12px;
     }
+    .header-nav {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      position: relative;
+      z-index: 2;
+    }
+    .header-link {
+      font-family: var(--font-ui);
+      font-size: var(--text-sm);
+      font-weight: 600;
+      letter-spacing: var(--track-caps);
+      text-transform: uppercase;
+      text-decoration: none;
+      color: rgba(255, 255, 255, 0.55);
+      transition: color 0.15s ease;
+    }
+    .header-link.active,
+    .header-link:hover {
+      color: var(--white);
+    }
     .header-logo img,
     .header-logo svg { width: auto; height: 32px; display: block; }
     .header-title {
@@ -66,33 +87,6 @@
       letter-spacing: 0.12em;
       text-transform: uppercase;
     }
-
-    .tabs {
-      display: flex;
-      gap: 3px;
-      margin-bottom: 20px;
-      background: var(--gray-200);
-      padding: 3px;
-      border-radius: var(--radius-sm);
-      width: 100%;
-    }
-    .tab {
-      flex: 1;
-      padding: 9px 28px;
-      border: none;
-      background: transparent;
-      cursor: pointer;
-      font-family: var(--font-ui);
-      font-size: var(--text-sm);
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: var(--track-caps);
-      border-radius: max(0px, calc(var(--radius-sm) - 3px));
-      color: var(--gray-600);
-      transition: all 0.15s;
-    }
-    .tab.active { background: var(--black); color: var(--white); }
-
     .layout {
       position: relative;
       display: grid;
@@ -594,6 +588,14 @@
     }
 
     @media (max-width: 980px) {
+      .header-nav {
+        gap: 12px;
+      }
+
+      .header-link {
+        font-size: var(--text-xs);
+      }
+
       .layout {
         grid-template-columns: 1fr;
         gap: 20px;

@@ -7,7 +7,7 @@ const VECTOR_PNG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQIAAACACAYAAA
 /* ════════════════════════════════════════════
    State
 ════════════════════════════════════════════ */
-let activeTab = 'public';
+const pageMode = document.body.dataset.mode === 'inner' ? 'inner' : 'public';
 let photoDataUrl = null;
 const COMPANY_NAME = 'PAI Defence';
 const ACCESS_PASSWORD_HASH = '662603275e69349c9f51a786ce24e99eef127bb973b9d54c4bce1799a3da5d0a';
@@ -23,6 +23,10 @@ const PHOTO_MIN_QUALITY = 0.5;
 ════════════════════════════════════════════ */
 const $ = id => document.getElementById(id);
 const v = id => ($( id) ? $(id).value.trim() : '');
+const on = (id, eventName, handler) => {
+  const element = $(id);
+  if (element) element.addEventListener(eventName, handler);
+};
 function esc(s) {
   return String(s)
     .replace(/&/g,'&amp;').replace(/</g,'&lt;')
@@ -192,20 +196,6 @@ function initAuthGate() {
 }
 
 /* ════════════════════════════════════════════
-   Tab switching
-════════════════════════════════════════════ */
-document.querySelectorAll('.tab').forEach(btn => {
-  btn.addEventListener('click', () => {
-    activeTab = btn.dataset.tab;
-    document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    $('form-public').style.display = activeTab === 'public' ? '' : 'none';
-    $('form-inner').style.display  = activeTab === 'inner'  ? '' : 'none';
-    renderPreview();
-  });
-});
-
-/* ════════════════════════════════════════════
    Photo upload
 ════════════════════════════════════════════ */
 function handlePhotoFile(file) {
@@ -229,24 +219,27 @@ function handlePhotoFile(file) {
   reader.readAsDataURL(file);
 }
 
-$('pub-photo-file').addEventListener('change', e => {
+on('pub-photo-file', 'change', e => {
   handlePhotoFile(e.target.files[0]);
 });
 
 const dropZone = $('photo-drop');
-dropZone.addEventListener('dragover', e => {
-  e.preventDefault();
-  dropZone.classList.add('dragover');
-});
-dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
-dropZone.addEventListener('drop', e => {
-  e.preventDefault();
-  dropZone.classList.remove('dragover');
-  handlePhotoFile(e.dataTransfer.files[0]);
-});
+if (dropZone) {
+  dropZone.addEventListener('dragover', e => {
+    e.preventDefault();
+    dropZone.classList.add('dragover');
+  });
+  dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+  dropZone.addEventListener('drop', e => {
+    e.preventDefault();
+    dropZone.classList.remove('dragover');
+    handlePhotoFile(e.dataTransfer.files[0]);
+  });
+}
 
-$('url-toggle-btn').addEventListener('click', () => {
+on('url-toggle-btn', 'click', () => {
   const field = $('url-field');
+  if (!field) return;
   field.style.display = field.style.display === 'none' ? '' : 'none';
 });
 
@@ -255,7 +248,7 @@ $('url-toggle-btn').addEventListener('click', () => {
 ════════════════════════════════════════════ */
 document.querySelectorAll('input').forEach(el => el.addEventListener('input', renderPreview));
 
-$('pub-photo').addEventListener('input', () => {
+on('pub-photo', 'input', () => {
   if (v('pub-photo')) {
     photoDataUrl = null;
     setPhotoUploadState(true);
@@ -265,7 +258,7 @@ $('pub-photo').addEventListener('input', () => {
 });
 
 function renderPreview() {
-  $('preview-box').innerHTML = activeTab === 'public' ? buildPublicPreview() : buildInnerPreview();
+  $('preview-box').innerHTML = pageMode === 'public' ? buildPublicPreview() : buildInnerPreview();
 }
 
 function buildPublicPreview() {
@@ -464,7 +457,7 @@ function generateInnerHtml() {
 $('copy-btn').addEventListener('click', async () => {
   const btn = $('copy-btn');
   btn.disabled = true;
-  const html = activeTab === 'public' ? generatePublicHtml() : generateInnerHtml();
+  const html = pageMode === 'public' ? generatePublicHtml() : generateInnerHtml();
   const copied = await copyHtmlToClipboard(html);
 
   try {
